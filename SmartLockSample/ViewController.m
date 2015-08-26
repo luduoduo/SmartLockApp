@@ -18,14 +18,25 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    // create a new scene
-    SCNScene *scene=[[SCNScene alloc]init];
+    [self setup3DScene];
     
-    //创建几何形状
+    //adjust orientation of object
+    [self.mainObjectNode runAction:[SCNAction rotateByX:M_PI/2 y:0 z:0 duration:1]];
+
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+#pragma mark - 3D scene
+
+-(SCNNode *) createMainObject
+{
     SCNCylinder *cylinderGeometry=[SCNCylinder cylinderWithRadius:1.0 height:0.3];
     cylinderGeometry.firstMaterial.diffuse.contents=[UIColor greenColor];
-    
-    //用几何形状创建node
     SCNNode *cylinderNode=[SCNNode nodeWithGeometry:cylinderGeometry];
     cylinderNode.name=@"cylinder";
     
@@ -38,20 +49,28 @@
     capsuleNode.position=SCNVector3Make(0, 0.12, -1.0);
     capsuleNode.eulerAngles=SCNVector3Make(M_PI/2, 0, 0);
     
-    //设定主物体
+    //main object
     SCNNode *gyroNode=[[SCNNode alloc]init];
     gyroNode.name=@"gyro";
     [gyroNode addChildNode:cylinderNode];
     [gyroNode addChildNode:capsuleNode];
     gyroNode.position=SCNVector3Make(0, 0, 0);
     
-    [scene.rootNode addChildNode:gyroNode];
+    return gyroNode;
+}
+
+
+- (void) setup3DScene
+{
+    // create a new scene and main object
+    SCNScene *scene=[[SCNScene alloc]init];
+    self.mainObjectNode=[self createMainObject];
+    [scene.rootNode addChildNode:self.mainObjectNode];
+
     
-    self.mainObjectNode=gyroNode;
-    //设定地平面
+    // create ground
     SCNPlane *planeGeometry=[SCNPlane planeWithWidth:200 height:200];
     planeGeometry.firstMaterial.diffuse.contents=[UIColor grayColor];
-    
     SCNNode *planeNode=[SCNNode nodeWithGeometry:planeGeometry];
     planeNode.eulerAngles = SCNVector3Make(-M_PI/2, 0, 0);
     planeNode.position = SCNVector3Make(0, -1.5, 0);
@@ -64,23 +83,11 @@
     [scene.rootNode addChildNode:cameraNode];
     
     // place the camera
-    //摆放照相机
     cameraNode.position = SCNVector3Make(-2, 3.5, 4.5);
-    //确保Camera朝向物体
-    SCNLookAtConstraint *constraint = [SCNLookAtConstraint lookAtConstraintWithTarget:gyroNode];
+    //make camera face to object
+    SCNLookAtConstraint *constraint = [SCNLookAtConstraint lookAtConstraintWithTarget:self.mainObjectNode];
     constraint.gimbalLockEnabled = YES;
     cameraNode.constraints= [NSArray arrayWithObjects:constraint, nil];
-    
-    
-    // create and add a light to the scene
-    //omni light
-    //    SCNNode *lightNode = [SCNNode node];
-    //    lightNode.light = [SCNLight light];
-    //    lightNode.light.type = SCNLightTypeOmni;
-    //    lightNode.light.castsShadow = YES;
-    //    lightNode.position = SCNVector3Make(20, 50, 10);
-    //
-    //    [scene.rootNode addChildNode:lightNode];
     
     //spot light
     SCNNode *spotLightNode = [SCNNode node];
@@ -88,14 +95,10 @@
     spotLightNode.light.type = SCNLightTypeSpot;
     spotLightNode.light.spotInnerAngle=20.0;
     spotLightNode.light.spotOuterAngle=80.0;
-    
     spotLightNode.light.castsShadow = YES;
     spotLightNode.position = SCNVector3Make(3, 5, 10);
-    //    lightNode.light.color = [UIColor greenColor];
-    
     [scene.rootNode addChildNode:spotLightNode];
     
-    //ambient光
     // create and add an ambient light to the scene
     SCNNode *ambientLightNode = [SCNNode node];
     ambientLightNode.light = [SCNLight light];
@@ -103,14 +106,8 @@
     ambientLightNode.light.color = [UIColor colorWithWhite:0.5 alpha:1.0];
     [scene.rootNode addChildNode:ambientLightNode];
     
-    
-    // animate the 3d object
-    //    [theNode runAction:[SCNAction repeatActionForever:[SCNAction rotateByX:0 y:0.1 z:0 duration:1]]];    //每秒多少弧度
-    
-    [self.mainObjectNode runAction:[SCNAction rotateByX:M_PI/2 y:0 z:0 duration:1]];
-    
-    // retrieve the SCNView
-    SCNView *scnView = (SCNView *)self.sceneView;
+    // setup the SCNView
+    SCNView *scnView = (SCNView *)self.sceneView;   //pre-cerated in storyboard
     
     // set the scene to the view
     scnView.scene = scene;
@@ -129,18 +126,12 @@
     NSMutableArray *gestureRecognizers = [NSMutableArray array];
     [gestureRecognizers addObject:tapGesture];
     
-    //这些手势是自带的
+    // default gest
     [gestureRecognizers addObjectsFromArray:scnView.gestureRecognizers];
     scnView.gestureRecognizers = gestureRecognizers;
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
-
-//捕获点击手势，相当于飞机被击中
 - (void) handleTap:(UIGestureRecognizer*)gestureRecognize
 {
     // retrieve the SCNView
@@ -159,8 +150,8 @@
         
         if (result.node.parentNode==self.mainObjectNode)
         {
-            //设定新的角度
-            //            self.mainObjectNode.eulerAngles=SCNVector3Make(M_PI/2, M_PI/6, 0);
+            //specify new angle
+            //self.mainObjectNode.eulerAngles=SCNVector3Make(M_PI/2, M_PI/6, 0);
             
             // highlight it
             [SCNTransaction begin];
