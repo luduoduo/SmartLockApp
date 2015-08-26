@@ -33,7 +33,7 @@
 
 #pragma mark - 3D scene
 
--(SCNNode *) createMainObject
+-(void) createMainObject: (SCNNode *)rootNode
 {
     SCNCylinder *cylinderGeometry=[SCNCylinder cylinderWithRadius:1.0 height:0.3];
     cylinderGeometry.firstMaterial.diffuse.contents=[UIColor greenColor];
@@ -51,12 +51,42 @@
     
     //main object
     SCNNode *gyroNode=[[SCNNode alloc]init];
-    gyroNode.name=@"gyro";
+    gyroNode.name=@"lock";
     [gyroNode addChildNode:cylinderNode];
     [gyroNode addChildNode:capsuleNode];
     gyroNode.position=SCNVector3Make(0, 0, 0);
+
+    [rootNode addChildNode:gyroNode];
+    self.mainObjectNode=gyroNode;
+}
+
+
+-(void) create3DButtons: (SCNNode *)rootNode
+{
+    SCNSphere *sphereGeometry=[SCNSphere sphereWithRadius:0.2];
+    sphereGeometry.firstMaterial.diffuse.contents=[UIColor yellowColor];
+    SCNNode *sphereNode=[SCNNode nodeWithGeometry:sphereGeometry];
+    sphereNode.name=@"startButton";
+    sphereNode.position=SCNVector3Make(-0.8, 2.2, 0);
+    [rootNode addChildNode:sphereNode];
+    self.btnStartNode=sphereNode;
     
-    return gyroNode;
+    sphereGeometry=[SCNSphere sphereWithRadius:0.2];
+    sphereGeometry.firstMaterial.diffuse.contents=[UIColor yellowColor];
+    sphereNode=[SCNNode nodeWithGeometry:sphereGeometry];
+    sphereNode.name=@"endButton";
+    sphereNode.position=SCNVector3Make(0, 2.2, 0);
+    [rootNode addChildNode:sphereNode];
+    self.btnEndNode=sphereNode;
+
+    
+    sphereGeometry=[SCNSphere sphereWithRadius:0.2];
+    sphereGeometry.firstMaterial.diffuse.contents=[UIColor whiteColor];
+    sphereNode=[SCNNode nodeWithGeometry:sphereGeometry];
+    sphereNode.name=@"searchButton";
+    sphereNode.position=SCNVector3Make(0.8, 2.2, 0);
+    [rootNode addChildNode:sphereNode];
+    self.btnSearchNode=sphereNode;
 }
 
 
@@ -64,9 +94,8 @@
 {
     // create a new scene and main object
     SCNScene *scene=[[SCNScene alloc]init];
-    self.mainObjectNode=[self createMainObject];
-    [scene.rootNode addChildNode:self.mainObjectNode];
-
+    [self createMainObject:scene.rootNode];
+    [self create3DButtons: scene.rootNode];
     
     // create ground
     SCNPlane *planeGeometry=[SCNPlane planeWithWidth:200 height:200];
@@ -141,44 +170,81 @@
     CGPoint p = [gestureRecognize locationInView:scnView];
     NSArray *hitResults = [scnView hitTest:p options:nil];
     
+    
     // check that we clicked on at least one object
     if([hitResults count] > 0)
     {
         // retrieved the first clicked object
         SCNHitTestResult *result = [hitResults objectAtIndex:0];
         
-        
-        if (result.node.parentNode==self.mainObjectNode)
+        if (result.node==self.btnStartNode)
+        {
+            [self highlightObject:result.node duration:0.25];
+            NSLog(@"marking start point");
+        }
+        else if (result.node==self.btnEndNode)
+        {
+            [self highlightObject:result.node duration:0.25];
+            NSLog(@"marking end point");
+        }
+        else if (result.node==self.btnSearchNode)
+        {
+            [self highlightObject:result.node duration:0.25];
+            NSLog(@"start searching");
+        }
+        else if (result.node.parentNode==self.mainObjectNode)
         {
             //specify new angle
             //self.mainObjectNode.eulerAngles=SCNVector3Make(M_PI/2, M_PI/6, 0);
+            [self highlightObject: result.node.parentNode duration:1];
             
-            // highlight it
-            [SCNTransaction begin];
-            [SCNTransaction setAnimationDuration:1];
-            
-            for (SCNNode *node in self.mainObjectNode.childNodes) {
-                // get its material
-                SCNMaterial *material = node.geometry.firstMaterial;
-                material.emission.contents = [UIColor redColor];
-                
-                [self.mainObjectNode runAction:[SCNAction rotateByX:0 y:0 z:M_PI/6 duration:1]];
-                
-            }
-            
-            // on completion - unhighlight
-            [SCNTransaction setCompletionBlock:^{
-                [SCNTransaction begin];
-                [SCNTransaction setAnimationDuration:0.5];
-                for (SCNNode *node in self.mainObjectNode.childNodes) {
-                    SCNMaterial *material = node.geometry.firstMaterial;
-                    material.emission.contents = [UIColor blackColor];
-                }
-                [SCNTransaction commit];
-            }];
-            
-            [SCNTransaction commit];
+            [result.node.parentNode runAction:[SCNAction rotateByX:0 y:0 z:M_PI/6 duration:1]];
         }
+
+        
+
     }
 }
+
+-(void) highlightObject:(SCNNode *)objectNode duration:(CFTimeInterval)sec
+{
+    // highlight it
+    [SCNTransaction begin];
+    [SCNTransaction setAnimationDuration:sec];
+    
+    if (objectNode.childNodes.count>0)
+    {
+        for (SCNNode *node in objectNode.childNodes) {
+            // get its material
+            SCNMaterial *material = node.geometry.firstMaterial;
+            material.emission.contents = [UIColor redColor];
+        }
+    }
+    else
+    {
+        objectNode.geometry.firstMaterial.emission.contents=[UIColor redColor];
+    }
+    
+    // on completion - unhighlight
+    [SCNTransaction setCompletionBlock:^{
+        [SCNTransaction begin];
+        [SCNTransaction setAnimationDuration:sec];
+        if (objectNode.childNodes.count>0)
+        {
+            for (SCNNode *node in objectNode.childNodes) {
+                // get its material
+                SCNMaterial *material = node.geometry.firstMaterial;
+                material.emission.contents = [UIColor blackColor];
+            }
+        }
+        else
+        {
+            objectNode.geometry.firstMaterial.emission.contents=[UIColor blackColor];
+        }        [SCNTransaction commit];
+    }];
+    
+    [SCNTransaction commit];
+}
+
+
 @end

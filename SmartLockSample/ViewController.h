@@ -15,5 +15,9 @@
 @property (weak, nonatomic) IBOutlet SCNView *sceneView;
 @property (nonatomic, strong) SCNNode *mainObjectNode;
 
+@property (nonatomic, strong) SCNNode *btnStartNode;
+@property (nonatomic, strong) SCNNode *btnEndNode;
+@property (nonatomic, strong) SCNNode *btnSearchNode;
+
 @end
 
