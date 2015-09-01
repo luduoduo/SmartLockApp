@@ -8,16 +8,21 @@
 
 #import <UIKit/UIKit.h>
 #import <SceneKit/SceneKit.h>
+#import "DFBlunoManager.h"
 
-
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController <DFBlunoDelegate>
 
 @property (weak, nonatomic) IBOutlet SCNView *sceneView;
 @property (nonatomic, strong) SCNNode *mainObjectNode;
+@property (nonatomic, strong) SCNNode *ambientLightNode;
 
 @property (nonatomic, strong) SCNNode *btnStartNode;
 @property (nonatomic, strong) SCNNode *btnEndNode;
 @property (nonatomic, strong) SCNNode *btnSearchNode;
+
+
+@property(strong, nonatomic) DFBlunoManager* blunoManager;
+@property(strong, nonatomic) DFBlunoDevice* blunoDev;
 
 @end
 

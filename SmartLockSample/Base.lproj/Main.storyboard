@@ -31,10 +31,101 @@
                     </view>
                     <connections>
                         <outlet property="sceneView" destination="eVB-BC-UNa" id="Bj1-aq-3hu"/>
+                        <segue destination="t9a-3A-hQK" kind="showDetail" identifier="toSearchListView" id="oLC-7i-Aku"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
+        </scene>
+        <!--Search BLE Devices-->
+        <scene sceneID="nze-s7-URK">
+            <objects>
+                <viewController id="0qG-4m-YKh" customClass="DeviceListViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="pVT-UZ-TfS"/>
+                        <viewControllerLayoutGuide type="bottom" id="lUy-nN-2a5"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Ndt-s5-hNv">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="rGo-M9-Wkc">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="BleDeviceCell" textLabel="Hdt-Hj-j1y" detailTextLabel="rsL-Ai-aT1" style="IBUITableViewCellStyleSubtitle" id="7Df-0Q-NPa">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="7Df-0Q-NPa" id="j6h-iZ-Toy">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Hdt-Hj-j1y">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="rsL-Ai-aT1">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="0qG-4m-YKh" id="CYz-ee-OxN"/>
+                                    <outlet property="delegate" destination="0qG-4m-YKh" id="sik-fj-LTo"/>
+                                </connections>
+                            </tableView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="SXY-Zj-i18">
+                                <rect key="frame" x="290" y="70" width="20" height="20"/>
+                            </activityIndicatorView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="centerX" secondItem="SXY-Zj-i18" secondAttribute="centerX" id="FUX-FJ-EVT"/>
+                            <constraint firstItem="rGo-M9-Wkc" firstAttribute="leading" secondItem="Ndt-s5-hNv" secondAttribute="leading" id="IgX-QE-8A1"/>
+                            <constraint firstAttribute="bottom" secondItem="rGo-M9-Wkc" secondAttribute="bottom" id="Wn5-bR-PA2"/>
+                            <constraint firstItem="rGo-M9-Wkc" firstAttribute="top" secondItem="Ndt-s5-hNv" secondAttribute="top" id="bBa-Mp-CYX"/>
+                            <constraint firstAttribute="trailing" secondItem="rGo-M9-Wkc" secondAttribute="trailing" id="u7E-yC-aas"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Search BLE Devices" id="Gff-Rl-SuU">
+                        <barButtonItem key="leftBarButtonItem" title="BACK" id="qQ5-Hc-JQ4">
+                            <connections>
+                                <action selector="btnBackClicked:" destination="0qG-4m-YKh" id="lfp-Wo-U0b"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" enabled="NO" systemItem="refresh" id="RCT-od-UWx"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="searchIndicator" destination="SXY-Zj-i18" id="l4C-2z-n1t"/>
+                        <outlet property="tableView" destination="rGo-M9-Wkc" id="IKO-QM-pXA"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vxN-4w-J9O" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1989" y="324"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="CMG-MW-doV">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="t9a-3A-hQK" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="raE-ru-nlu">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="0qG-4m-YKh" kind="relationship" relationship="rootViewController" id="wIP-Zd-UNU"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dq4-NG-XoD" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1177" y="324"/>
         </scene>
     </scenes>
 </document>
