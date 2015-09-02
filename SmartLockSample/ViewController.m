@@ -336,6 +336,7 @@
 
 }
 
+float count=0;
 -(void)didReceiveData:(NSData*)data Device:(DFBlunoDevice*)dev
 {
     char *p=(char *)data.bytes;
@@ -353,34 +354,24 @@
         float pitch= [[str substringWithRange:NSMakeRange(5, 5)] floatValue]/10.0;
         float roll= [[str substringWithRange:NSMakeRange(10, 5)] floatValue]/10.0;
         
-        NSLog(@"Y=%f, P=%f, R=%f", yaw, pitch, roll);
+        NSLog(@"Oringial                                 Y=%f, P=%f, R=%f", yaw, pitch, roll);
         
         dispatch_async(dispatch_get_main_queue(), ^{
             //YPR相当于绕SceneKit的-y, x, -z
             float rorateX=pitch/180.0*M_PI;
             float rorateY=-(yaw-_angle_offset)/180.0*M_PI;
             float rorateZ=-roll/180.0*M_PI;
-
-            //reset to init angle
-            [self.mainObjectNode runAction:[SCNAction rotateToX:0 y:0 z:0 duration:0]];
-
-            //yaw
-            [self.mainObjectNode runAction:[SCNAction rotateByAngle:rorateY
-                                                         aroundAxis:SCNVector3Make(0, 1, 0)
-                                                           duration:0]];
-            //pitch
-            [self.mainObjectNode runAction:[SCNAction rotateByAngle:rorateX
-                                                         aroundAxis:SCNVector3Make(1, 0, 0)
-                                                           duration:0]];
-            //roll
-            [self.mainObjectNode runAction:[SCNAction rotateByAngle:rorateZ
-                                                         aroundAxis:SCNVector3Make(0, 0, 1)
-                                                           duration:0]];
             
-            NSLog(@"YPR=%f,   %f,   %f",
-                  self.mainObjectNode.eulerAngles.y/M_PI*180,
-                  self.mainObjectNode.eulerAngles.x/M_PI*180,
-                  self.mainObjectNode.eulerAngles.z/M_PI*180);
+            SCNMatrix4 dcmYaw=SCNMatrix4MakeRotation(rorateY, 0, 1, 0);
+            SCNMatrix4 dcmPitch=SCNMatrix4MakeRotation(rorateX, 1, 0, 0);
+            SCNMatrix4 dcmRoll=SCNMatrix4MakeRotation(rorateZ, 0, 0, 1);
+            self.mainObjectNode.transform= SCNMatrix4Mult(SCNMatrix4Mult(dcmRoll, dcmPitch),dcmYaw);
+            
+//            NSLog(@"rotate=%f,   %f,   %f",
+//                  rorateY/M_PI*180,
+//                  rorateX/M_PI*180,
+//                  rorateZ/M_PI*180);
+
             _angle_current=yaw;
             
         });
@@ -388,7 +379,7 @@
     }
     else
     {
-        NSLog([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+//        NSLog([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
 //        self.labelReceivedMsg.text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     }
 }
