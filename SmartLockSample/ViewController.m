@@ -337,50 +337,66 @@
 }
 
 float count=0;
+char recv_buffer[260];
+int last_index=0;
 -(void)didReceiveData:(NSData*)data Device:(DFBlunoDevice*)dev
 {
     char *p=(char *)data.bytes;
-    //"short text for float" mode
-    //for exmaple, @-1653-0043+1620 means -165.3, -4.3, +162
-    if (data.length==18 && *p=='@')
+    if (last_index+data.length>255)
     {
-        p++;
-        char temp[16];
-        memcpy(temp, p, 15);
-        temp[15]=0;
-        
-        NSString *str=[NSString stringWithUTF8String:temp];
-        float yaw= [[str substringWithRange:NSMakeRange(0, 5)] floatValue]/10.0;
-        float pitch= [[str substringWithRange:NSMakeRange(5, 5)] floatValue]/10.0;
-        float roll= [[str substringWithRange:NSMakeRange(10, 5)] floatValue]/10.0;
-        
-        NSLog(@"Oringial                                 Y=%f, P=%f, R=%f", yaw, pitch, roll);
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            //YPR相当于绕SceneKit的-y, x, -z
-            float rorateX=pitch/180.0*M_PI;
-            float rorateY=-(yaw-_angle_offset)/180.0*M_PI;
-            float rorateZ=-roll/180.0*M_PI;
-            
-            SCNMatrix4 dcmYaw=SCNMatrix4MakeRotation(rorateY, 0, 1, 0);
-            SCNMatrix4 dcmPitch=SCNMatrix4MakeRotation(rorateX, 1, 0, 0);
-            SCNMatrix4 dcmRoll=SCNMatrix4MakeRotation(rorateZ, 0, 0, 1);
-            self.mainObjectNode.transform= SCNMatrix4Mult(SCNMatrix4Mult(dcmRoll, dcmPitch),dcmYaw);
-            
-//            NSLog(@"rotate=%f,   %f,   %f",
-//                  rorateY/M_PI*180,
-//                  rorateX/M_PI*180,
-//                  rorateZ/M_PI*180);
-
-            _angle_current=yaw;
-            
-        });
-        
+        NSLog(@"ERROR!!!!!!!!!!!!!!!!!!");
+        recv_buffer[last_index]='\r';
+        recv_buffer[last_index+1]='\n';
+        last_index+=2;
     }
-    else
+    memcpy(recv_buffer+last_index, p, data.length);
+    last_index+=(int)data.length;
+    
+    if (p[data.length-2]=='\r' && p[data.length-1]=='\n')
     {
-//        NSLog([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-//        self.labelReceivedMsg.text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        //"short text for float" mode
+        //for exmaple, @-1653-0043+1620 means -165.3, -4.3, +162
+        if (last_index==18 && recv_buffer[0]=='@')
+        {
+            char temp[16];
+            memcpy(temp, recv_buffer+1, 15);
+            temp[15]=0;
+            
+            NSString *str=[NSString stringWithUTF8String:temp];
+            float yaw= [[str substringWithRange:NSMakeRange(0, 5)] floatValue]/10.0;
+            float pitch= [[str substringWithRange:NSMakeRange(5, 5)] floatValue]/10.0;
+            float roll= [[str substringWithRange:NSMakeRange(10, 5)] floatValue]/10.0;
+            
+            NSLog(@"update:  Y=%f, P=%f, R=%f,   %@", yaw, pitch, roll, str);
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                //YPR相当于绕SceneKit的-y, x, -z
+                float rorateX=pitch/180.0*M_PI;
+                float rorateY=-(yaw-_angle_offset)/180.0*M_PI;
+                float rorateZ=-roll/180.0*M_PI;
+                
+                SCNMatrix4 dcmYaw=SCNMatrix4MakeRotation(rorateY, 0, 1, 0);
+                SCNMatrix4 dcmPitch=SCNMatrix4MakeRotation(rorateX, 1, 0, 0);
+                SCNMatrix4 dcmRoll=SCNMatrix4MakeRotation(rorateZ, 0, 0, 1);
+                self.mainObjectNode.transform= SCNMatrix4Mult(SCNMatrix4Mult(dcmRoll, dcmPitch),dcmYaw);
+                
+    //            NSLog(@"rotate=%f,   %f,   %f",
+    //                  rorateY/M_PI*180,
+    //                  rorateX/M_PI*180,
+    //                  rorateZ/M_PI*180);
+
+                _angle_current=yaw;
+                
+            });
+            
+        }
+        else
+        {
+            NSLog([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+    //        self.labelReceivedMsg.text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        }
+
+        last_index=0;   //this line is over
     }
 }
 
