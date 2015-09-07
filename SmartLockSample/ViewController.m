@@ -200,23 +200,23 @@
         
         if (result.node==self.btnStartNode)
         {
-            [self highlightObject:result.node duration:0.25];
+            [self highlightObject:result.node duration:0.25 needToRecover:YES];
             NSLog(@"marking start point");
         }
         else if (result.node==self.btnEndNode)
         {
-            [self highlightObject:result.node duration:0.25];
+            [self highlightObject:result.node duration:0.25 needToRecover:YES];
             NSLog(@"marking end point");
         }
         else if (result.node==self.btnSearchNode)
         {
-            [self highlightObject:result.node duration:0.25];
+            [self highlightObject:result.node duration:0.25 needToRecover:YES];
             self.ambientLightNode.hidden=YES;
             [self performSegueWithIdentifier:@"toSearchListView" sender:nil];
         }
         else if (result.node.parentNode==self.mainObjectNode)
         {
-            [self highlightObject: result.node.parentNode duration:0.5];
+            [self highlightObject: result.node.parentNode duration:0.5 needToRecover:YES];
             _angle_offset=_angle_current;
         }
     }
@@ -233,7 +233,7 @@
 }
 
 
--(void) highlightObject:(SCNNode *)objectNode duration:(CFTimeInterval)sec
+-(void) highlightObject:(SCNNode *)objectNode duration:(CFTimeInterval)sec needToRecover:(bool)needToRecover
 {
     // highlight it
     [SCNTransaction begin];
@@ -252,23 +252,26 @@
         objectNode.geometry.firstMaterial.emission.contents=[UIColor redColor];
     }
     
-    // on completion - unhighlight
-    [SCNTransaction setCompletionBlock:^{
-        [SCNTransaction begin];
-        [SCNTransaction setAnimationDuration:sec];
-        if (objectNode.childNodes.count>0)
-        {
-            for (SCNNode *node in objectNode.childNodes) {
-                // get its material
-                SCNMaterial *material = node.geometry.firstMaterial;
-                material.emission.contents = [UIColor blackColor];
+    if (needToRecover)
+    {
+        // on completion - unhighlight
+        [SCNTransaction setCompletionBlock:^{
+            [SCNTransaction begin];
+            [SCNTransaction setAnimationDuration:sec];
+            if (objectNode.childNodes.count>0)
+            {
+                for (SCNNode *node in objectNode.childNodes) {
+                    // get its material
+                    SCNMaterial *material = node.geometry.firstMaterial;
+                    material.emission.contents = [UIColor blackColor];
+                }
             }
-        }
-        else
-        {
-            objectNode.geometry.firstMaterial.emission.contents=[UIColor blackColor];
-        }        [SCNTransaction commit];
-    }];
+            else
+            {
+                objectNode.geometry.firstMaterial.emission.contents=[UIColor blackColor];
+            }        [SCNTransaction commit];
+        }];
+    }
     
     [SCNTransaction commit];
 }
@@ -389,6 +392,37 @@ int last_index=0;
                 
             });
             
+        }
+        else if (last_index==10 && recv_buffer[0]=='%')  //for lock status
+        {
+            char temp[8];
+            memcpy(temp, recv_buffer+1, 7); //skip first %
+            temp[7]=0;
+            
+            NSString *str=[NSString stringWithUTF8String:temp];
+            float angle= [[str substringWithRange:NSMakeRange(0, 5)] floatValue]/10.0;
+            int status= [[str substringWithRange:NSMakeRange(6, 1)] intValue];
+
+            NSLog(@"update:  angle=%f,   status=%d,  %@", angle, status, str);
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                SCNMatrix4 dcmYaw=SCNMatrix4MakeRotation(-angle/180.0*M_PI, 0, 1, 0);
+                SCNMatrix4 dcmPitch=SCNMatrix4MakeRotation(M_PI/2, 1, 0, 0);
+                self.mainObjectNode.transform= SCNMatrix4Mult(dcmYaw, dcmPitch);
+ 
+                _angle_current=angle;
+                if (status==0)
+                {
+                    [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor redColor];
+                    [self highlightObject: self.mainObjectNode duration:0.005 needToRecover:YES];
+                }
+                else
+                {
+                    [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor greenColor];
+                    //                    [self highlightObject: self.mainObjectNode duration:0 needToRecover:YES];
+                }
+            });
+
         }
         else
         {
