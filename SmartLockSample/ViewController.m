@@ -182,6 +182,21 @@
 
 
 #pragma mark - tap processing for 3D scene
+-(NSString *)generateSettingString: (BOOL) isUp
+{
+    NSString* stringHolder;
+    int angle_i=(int)fabs(round(_angle_current));
+    if (angle_i<10)
+        stringHolder=@"00";
+    else if (angle_i<100)
+        stringHolder=@"0";
+    else if (angle_i<1000)
+        stringHolder=@"";
+    
+    NSString *stringData=[NSString stringWithFormat:@"#i%c%c%@%d", isUp?'u':'d', _angle_current>0?'+':'-', stringHolder, angle_i];    
+    return stringData;
+}
+
 - (void) handleTap:(UIGestureRecognizer*)gestureRecognize
 {
     // retrieve the SCNView
@@ -201,12 +216,16 @@
         if (result.node==self.btnStartNode)
         {
             [self highlightObject:result.node duration:0.25 needToRecover:YES];
-            NSLog(@"marking start point");
+
+            NSData* data = [[self generateSettingString:NO] dataUsingEncoding:NSUTF8StringEncoding];
+            [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
+            
         }
         else if (result.node==self.btnEndNode)
         {
             [self highlightObject:result.node duration:0.25 needToRecover:YES];
-            NSLog(@"marking end point");
+            NSData* data = [[self generateSettingString:YES] dataUsingEncoding:NSUTF8StringEncoding];
+            [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
         }
         else if (result.node==self.btnSearchNode)
         {
