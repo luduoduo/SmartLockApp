@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "DeviceListViewController.h"
+#import "AppDelegate.h"
 
 @interface ViewController ()
 
@@ -430,8 +431,41 @@ int last_index=0;
                 self.mainObjectNode.transform= SCNMatrix4Mult(dcmYaw, dcmPitch);
  
                 _angle_current=angle;
-                if (status==0)
+                if (status==0)  //lock is open
                 {
+                    if ([[UIApplication sharedApplication] applicationState]== UIApplicationStateBackground)
+                    {
+                        AppDelegate *delegate=(AppDelegate *)[UIApplication sharedApplication].delegate;
+                        if (delegate.appIconBadgeNumber==0)
+                        {
+                            //收到数据, 设置推送
+                            UILocalNotification *noti = [[UILocalNotification alloc] init];
+                            if (noti)
+                            {
+                                //设置时区
+                                noti.timeZone = [NSTimeZone defaultTimeZone];
+                                //设置重复间隔
+//                                noti.repeatInterval = NSCalendarUnitMinute;
+                                //推送声音
+                                noti.soundName = UILocalNotificationDefaultSoundName;
+                                //内容
+                                noti.alertBody = @"lock is open";
+                                noti.alertAction = @"open the app";
+                                //显示在icon上的红色圈中的数子
+                                delegate.appIconBadgeNumber=delegate.appIconBadgeNumber+1;
+                                noti.applicationIconBadgeNumber = delegate.appIconBadgeNumber;
+                                //设置userinfo 方便在之后需要撤销的时候使用
+    //                            NSDictionary *infoDic = [NSDictionary dictionaryWithObject:@"name" forKey:@"key"];
+    //                            noti.userInfo = infoDic;  
+                                //添加推送到uiapplication
+    //                            UIApplication *app = [UIApplication sharedApplication];  
+    //                            [app scheduleLocalNotification:noti];
+                                
+                                [[UIApplication sharedApplication] presentLocalNotificationNow:noti];
+                            }
+                        }
+                    }
+                    
                     [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor redColor];
                     [self highlightObject: self.mainObjectNode duration:0.005 needToRecover:YES];
                 }

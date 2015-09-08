@@ -12,6 +12,7 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
-
+//记录图标上的通知数字
+@property (nonatomic, assign) NSInteger appIconBadgeNumber;
 @end
 

@@ -462,6 +462,7 @@
 				1F370F351B8D50B900A16D9A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1F370F361B8D50B900A16D9A /* Build configuration list for PBXNativeTarget "SmartLockSampleTests" */ = {
 			isa = XCConfigurationList;
@@ -470,6 +471,7 @@
 				1F370F381B8D50B900A16D9A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
