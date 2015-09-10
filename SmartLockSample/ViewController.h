@@ -16,8 +16,8 @@
 @property (nonatomic, strong) SCNNode *mainObjectNode;
 @property (nonatomic, strong) SCNNode *ambientLightNode;
 
-@property (nonatomic, strong) SCNNode *btnStartNode;
-@property (nonatomic, strong) SCNNode *btnEndNode;
+@property (nonatomic, strong) SCNNode *btnUnlockNode;
+@property (nonatomic, strong) SCNNode *btnLockNode;
 @property (nonatomic, strong) SCNNode *btnSearchNode;
 
 

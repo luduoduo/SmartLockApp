@@ -82,20 +82,20 @@
 -(void) create3DButtons: (SCNNode *)rootNode
 {
     SCNSphere *sphereGeometry=[SCNSphere sphereWithRadius:0.2];
-    sphereGeometry.firstMaterial.diffuse.contents=[UIColor yellowColor];
+    sphereGeometry.firstMaterial.diffuse.contents=[UIColor redColor];
     SCNNode *sphereNode=[SCNNode nodeWithGeometry:sphereGeometry];
     sphereNode.name=@"startButton";
     sphereNode.position=SCNVector3Make(-0.8, 2.2, 0);
     [rootNode addChildNode:sphereNode];
-    self.btnStartNode=sphereNode;
+    self.btnUnlockNode=sphereNode;
     
     sphereGeometry=[SCNSphere sphereWithRadius:0.2];
-    sphereGeometry.firstMaterial.diffuse.contents=[UIColor yellowColor];
+    sphereGeometry.firstMaterial.diffuse.contents=[UIColor greenColor];
     sphereNode=[SCNNode nodeWithGeometry:sphereGeometry];
     sphereNode.name=@"endButton";
     sphereNode.position=SCNVector3Make(0, 2.2, 0);
     [rootNode addChildNode:sphereNode];
-    self.btnEndNode=sphereNode;
+    self.btnLockNode=sphereNode;
 
     
     sphereGeometry=[SCNSphere sphereWithRadius:0.2];
@@ -183,7 +183,7 @@
 
 
 #pragma mark - tap processing for 3D scene
--(NSString *)generateSettingString: (BOOL) isUp
+-(NSString *)generateSettingString: (BOOL) isLock
 {
     NSString* stringHolder;
     int angle_i=(int)fabs(round(_angle_current));
@@ -194,7 +194,7 @@
     else if (angle_i<1000)
         stringHolder=@"";
     
-    NSString *stringData=[NSString stringWithFormat:@"#i%c%c%@%d", isUp?'u':'d', _angle_current>0?'+':'-', stringHolder, angle_i];    
+    NSString *stringData=[NSString stringWithFormat:@"#i%c%c%@%d", isLock?'l':'u', _angle_current>0?'+':'-', stringHolder, angle_i];
     return stringData;
 }
 
@@ -214,7 +214,7 @@
         // retrieved the first clicked object
         SCNHitTestResult *result = [hitResults objectAtIndex:0];
         
-        if (result.node==self.btnStartNode)
+        if (result.node==self.btnUnlockNode)
         {
             [self highlightObject:result.node duration:0.25 needToRecover:YES];
 
@@ -222,7 +222,7 @@
             [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
             
         }
-        else if (result.node==self.btnEndNode)
+        else if (result.node==self.btnLockNode)
         {
             [self highlightObject:result.node duration:0.25 needToRecover:YES];
             NSData* data = [[self generateSettingString:YES] dataUsingEncoding:NSUTF8StringEncoding];
@@ -431,7 +431,7 @@ int last_index=0;
                 self.mainObjectNode.transform= SCNMatrix4Mult(dcmYaw, dcmPitch);
  
                 _angle_current=angle;
-                if (status==0)  //lock is open
+                if (status<=0)  //lock is open
                 {
                     if ([[UIApplication sharedApplication] applicationState]== UIApplicationStateBackground)
                     {
@@ -471,7 +471,14 @@ int last_index=0;
                 }
                 else
                 {
-                    [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor greenColor];
+                    if (status==1)
+                        [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor greenColor];
+                    else if (status==2)
+                        [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor yellowColor];
+                    else if (status>=3)
+                        [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor orangeColor];
+                    
+
                     //                    [self highlightObject: self.mainObjectNode duration:0 needToRecover:YES];
                 }
             });
