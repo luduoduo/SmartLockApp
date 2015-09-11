@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "DeviceListViewController.h"
 #import "AppDelegate.h"
+#import <AudioToolbox/AudioToolbox.h>
 
 @interface ViewController ()
 
@@ -19,6 +20,10 @@
     float _angle_offset;
     float _angle_current;
 }
+
+SystemSoundID id_alarm=1010;
+SystemSoundID id_button=1052;
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
@@ -31,6 +36,7 @@
     //BLE settings
     self.blunoManager = [DFBlunoManager sharedInstance];
     _angle_offset=0;
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -47,8 +53,6 @@
 {
     self.blunoManager.delegate = nil;
 }
-
-
 #pragma mark - 3D scene
 
 -(void) createMainObject: (SCNNode *)rootNode
@@ -198,6 +202,7 @@
     return stringData;
 }
 
+
 - (void) handleTap:(UIGestureRecognizer*)gestureRecognize
 {
     // retrieve the SCNView
@@ -211,9 +216,11 @@
     // check that we clicked on at least one object
     if([hitResults count] > 0)
     {
+        AudioServicesPlaySystemSound(id_button);
+
         // retrieved the first clicked object
         SCNHitTestResult *result = [hitResults objectAtIndex:0];
-        
+
         if (result.node==self.btnUnlockNode)
         {
             [self highlightObject:result.node duration:0.25 needToRecover:YES];
@@ -359,7 +366,7 @@
 
 }
 
-float count=0;
+int alarm_count=0;
 char recv_buffer[260];
 int last_index=0;
 -(void)didReceiveData:(NSData*)data Device:(DFBlunoDevice*)dev
@@ -468,9 +475,15 @@ int last_index=0;
                     
                     [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor redColor];
                     [self highlightObject: self.mainObjectNode duration:0.005 needToRecover:YES];
+                    
+                    alarm_count++;
+                    if (alarm_count%20==1)
+                        AudioServicesPlaySystemSound(id_alarm);
                 }
                 else
                 {
+                    alarm_count=0;
+                    
                     if (status==1)
                         [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor greenColor];
                     else if (status==2)
@@ -498,5 +511,5 @@ int last_index=0;
 {
     NSLog(@"didUpdatedDeviceInfo");
 }
-
 @end
+

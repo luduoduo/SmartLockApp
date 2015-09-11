@@ -19,6 +19,7 @@
 		1F370F451B8D628300A16D9A /* DFBlunoDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F370F401B8D628300A16D9A /* DFBlunoDevice.m */; };
 		1F370F461B8D628300A16D9A /* DFBlunoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F370F421B8D628300A16D9A /* DFBlunoManager.m */; };
 		1F370F4A1B8DA15700A16D9A /* DeviceListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F370F481B8D645200A16D9A /* DeviceListViewController.m */; };
+		1F3CDB211BA2B8C000B26B7D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F3CDB201BA2B8C000B26B7D /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		1F370F421B8D628300A16D9A /* DFBlunoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBlunoManager.m; sourceTree = "<group>"; };
 		1F370F471B8D645200A16D9A /* DeviceListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceListViewController.h; sourceTree = "<group>"; };
 		1F370F481B8D645200A16D9A /* DeviceListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceListViewController.m; sourceTree = "<group>"; };
+		1F3CDB201BA2B8C000B26B7D /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F3CDB211BA2B8C000B26B7D /* AudioToolbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +81,7 @@
 		1F370F071B8D50B900A16D9A = {
 			isa = PBXGroup;
 			children = (
+				1F3CDB201BA2B8C000B26B7D /* AudioToolbox.framework */,
 				1F370F121B8D50B900A16D9A /* SmartLockSample */,
 				1F370F2C1B8D50B900A16D9A /* SmartLockSampleTests */,
 				1F370F111B8D50B900A16D9A /* Products */,
