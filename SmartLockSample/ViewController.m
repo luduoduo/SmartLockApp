@@ -221,6 +221,7 @@ SystemSoundID id_button=1052;
         // retrieved the first clicked object
         SCNHitTestResult *result = [hitResults objectAtIndex:0];
 
+        //解锁位置按钮
         if (result.node==self.btnUnlockNode)
         {
             [self highlightObject:result.node duration:0.25 needToRecover:YES];
@@ -229,22 +230,29 @@ SystemSoundID id_button=1052;
             [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
             
         }
+        //上锁位置按钮
         else if (result.node==self.btnLockNode)
         {
             [self highlightObject:result.node duration:0.25 needToRecover:YES];
             NSData* data = [[self generateSettingString:YES] dataUsingEncoding:NSUTF8StringEncoding];
             [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
         }
+        //搜索按钮
         else if (result.node==self.btnSearchNode)
         {
             [self highlightObject:result.node duration:0.25 needToRecover:YES];
             self.ambientLightNode.hidden=YES;
             [self performSegueWithIdentifier:@"toSearchListView" sender:nil];
         }
+        //主体按钮，用于设定初始状态，要求用户在开锁N区设定
         else if (result.node.parentNode==self.mainObjectNode)
         {
             [self highlightObject: result.node.parentNode duration:0.5 needToRecover:YES];
             _angle_offset=_angle_current;
+            
+            
+            NSData* data = [@"#ir" dataUsingEncoding:NSUTF8StringEncoding];
+            [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
         }
     }
 }
