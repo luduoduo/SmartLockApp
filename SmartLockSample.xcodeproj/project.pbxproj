@@ -20,6 +20,13 @@
 		1F370F461B8D628300A16D9A /* DFBlunoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F370F421B8D628300A16D9A /* DFBlunoManager.m */; };
 		1F370F4A1B8DA15700A16D9A /* DeviceListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F370F481B8D645200A16D9A /* DeviceListViewController.m */; };
 		1F3CDB211BA2B8C000B26B7D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F3CDB201BA2B8C000B26B7D /* AudioToolbox.framework */; };
+		1F3CDB2C1BA3355A00B26B7D /* InterfaceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F3CDB2B1BA3355A00B26B7D /* InterfaceController.m */; };
+		1F3CDB2F1BA3355A00B26B7D /* GlanceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F3CDB2E1BA3355A00B26B7D /* GlanceController.m */; };
+		1F3CDB311BA3355A00B26B7D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F3CDB301BA3355A00B26B7D /* Images.xcassets */; };
+		1F3CDB351BA3355B00B26B7D /* SmartLockSample WatchKit App.app in Resources */ = {isa = PBXBuildFile; fileRef = 1F3CDB341BA3355B00B26B7D /* SmartLockSample WatchKit App.app */; };
+		1F3CDB3D1BA3355B00B26B7D /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F3CDB3B1BA3355B00B26B7D /* Interface.storyboard */; };
+		1F3CDB421BA3355B00B26B7D /* SmartLockSample WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 1F3CDB261BA3355A00B26B7D /* SmartLockSample WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1FEB125A1BA7323B008A738A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F370F201B8D50B900A16D9A /* Images.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +37,35 @@
 			remoteGlobalIDString = 1F370F0F1B8D50B900A16D9A;
 			remoteInfo = SmartLockSample;
 		};
+		1F3CDB361BA3355B00B26B7D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1F370F081B8D50B900A16D9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1F3CDB331BA3355B00B26B7D;
+			remoteInfo = "SmartLockSample WatchKit App";
+		};
+		1F3CDB401BA3355B00B26B7D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1F370F081B8D50B900A16D9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1F3CDB251BA3355A00B26B7D;
+			remoteInfo = "SmartLockSample WatchKit Extension";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1F3CDB491BA3355B00B26B7D /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1F3CDB421BA3355B00B26B7D /* SmartLockSample WatchKit Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1F370F101B8D50B900A16D9A /* SmartLockSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartLockSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -57,6 +92,16 @@
 		1F370F471B8D645200A16D9A /* DeviceListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceListViewController.h; sourceTree = "<group>"; };
 		1F370F481B8D645200A16D9A /* DeviceListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceListViewController.m; sourceTree = "<group>"; };
 		1F3CDB201BA2B8C000B26B7D /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		1F3CDB261BA3355A00B26B7D /* SmartLockSample WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "SmartLockSample WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F3CDB291BA3355A00B26B7D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F3CDB2A1BA3355A00B26B7D /* InterfaceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InterfaceController.h; sourceTree = "<group>"; };
+		1F3CDB2B1BA3355A00B26B7D /* InterfaceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InterfaceController.m; sourceTree = "<group>"; };
+		1F3CDB2D1BA3355A00B26B7D /* GlanceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GlanceController.h; sourceTree = "<group>"; };
+		1F3CDB2E1BA3355A00B26B7D /* GlanceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GlanceController.m; sourceTree = "<group>"; };
+		1F3CDB301BA3355A00B26B7D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		1F3CDB341BA3355B00B26B7D /* SmartLockSample WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SmartLockSample WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F3CDB3A1BA3355B00B26B7D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F3CDB3C1BA3355B00B26B7D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +120,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1F3CDB231BA3355A00B26B7D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -84,6 +136,8 @@
 				1F3CDB201BA2B8C000B26B7D /* AudioToolbox.framework */,
 				1F370F121B8D50B900A16D9A /* SmartLockSample */,
 				1F370F2C1B8D50B900A16D9A /* SmartLockSampleTests */,
+				1F3CDB271BA3355A00B26B7D /* SmartLockSample WatchKit Extension */,
+				1F3CDB381BA3355B00B26B7D /* SmartLockSample WatchKit App */,
 				1F370F111B8D50B900A16D9A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -93,6 +147,8 @@
 			children = (
 				1F370F101B8D50B900A16D9A /* SmartLockSample.app */,
 				1F370F291B8D50B900A16D9A /* SmartLockSampleTests.xctest */,
+				1F3CDB261BA3355A00B26B7D /* SmartLockSample WatchKit Extension.appex */,
+				1F3CDB341BA3355B00B26B7D /* SmartLockSample WatchKit App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -164,6 +220,44 @@
 			path = Core;
 			sourceTree = "<group>";
 		};
+		1F3CDB271BA3355A00B26B7D /* SmartLockSample WatchKit Extension */ = {
+			isa = PBXGroup;
+			children = (
+				1F3CDB2A1BA3355A00B26B7D /* InterfaceController.h */,
+				1F3CDB2B1BA3355A00B26B7D /* InterfaceController.m */,
+				1F3CDB2D1BA3355A00B26B7D /* GlanceController.h */,
+				1F3CDB2E1BA3355A00B26B7D /* GlanceController.m */,
+				1F3CDB301BA3355A00B26B7D /* Images.xcassets */,
+				1F3CDB281BA3355A00B26B7D /* Supporting Files */,
+			);
+			path = "SmartLockSample WatchKit Extension";
+			sourceTree = "<group>";
+		};
+		1F3CDB281BA3355A00B26B7D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1F3CDB291BA3355A00B26B7D /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		1F3CDB381BA3355B00B26B7D /* SmartLockSample WatchKit App */ = {
+			isa = PBXGroup;
+			children = (
+				1F3CDB3B1BA3355B00B26B7D /* Interface.storyboard */,
+				1F3CDB391BA3355B00B26B7D /* Supporting Files */,
+			);
+			path = "SmartLockSample WatchKit App";
+			sourceTree = "<group>";
+		};
+		1F3CDB391BA3355B00B26B7D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1F3CDB3A1BA3355B00B26B7D /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -174,10 +268,12 @@
 				1F370F0C1B8D50B900A16D9A /* Sources */,
 				1F370F0D1B8D50B900A16D9A /* Frameworks */,
 				1F370F0E1B8D50B900A16D9A /* Resources */,
+				1F3CDB491BA3355B00B26B7D /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1F3CDB411BA3355B00B26B7D /* PBXTargetDependency */,
 			);
 			name = SmartLockSample;
 			productName = SmartLockSample;
@@ -202,6 +298,39 @@
 			productReference = 1F370F291B8D50B900A16D9A /* SmartLockSampleTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		1F3CDB251BA3355A00B26B7D /* SmartLockSample WatchKit Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F3CDB481BA3355B00B26B7D /* Build configuration list for PBXNativeTarget "SmartLockSample WatchKit Extension" */;
+			buildPhases = (
+				1F3CDB221BA3355A00B26B7D /* Sources */,
+				1F3CDB231BA3355A00B26B7D /* Frameworks */,
+				1F3CDB241BA3355A00B26B7D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1F3CDB371BA3355B00B26B7D /* PBXTargetDependency */,
+			);
+			name = "SmartLockSample WatchKit Extension";
+			productName = "SmartLockSample WatchKit Extension";
+			productReference = 1F3CDB261BA3355A00B26B7D /* SmartLockSample WatchKit Extension.appex */;
+			productType = "com.apple.product-type.watchkit-extension";
+		};
+		1F3CDB331BA3355B00B26B7D /* SmartLockSample WatchKit App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F3CDB471BA3355B00B26B7D /* Build configuration list for PBXNativeTarget "SmartLockSample WatchKit App" */;
+			buildPhases = (
+				1F3CDB321BA3355B00B26B7D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SmartLockSample WatchKit App";
+			productName = "SmartLockSample WatchKit App";
+			productReference = 1F3CDB341BA3355B00B26B7D /* SmartLockSample WatchKit App.app */;
+			productType = "com.apple.product-type.application.watchapp";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -213,10 +342,19 @@
 				TargetAttributes = {
 					1F370F0F1B8D50B900A16D9A = {
 						CreatedOnToolsVersion = 6.4;
+						DevelopmentTeam = XR4Q24VYGM;
 					};
 					1F370F281B8D50B900A16D9A = {
 						CreatedOnToolsVersion = 6.4;
 						TestTargetID = 1F370F0F1B8D50B900A16D9A;
+					};
+					1F3CDB251BA3355A00B26B7D = {
+						CreatedOnToolsVersion = 6.4;
+						DevelopmentTeam = XR4Q24VYGM;
+					};
+					1F3CDB331BA3355B00B26B7D = {
+						CreatedOnToolsVersion = 6.4;
+						DevelopmentTeam = XR4Q24VYGM;
 					};
 				};
 			};
@@ -235,6 +373,8 @@
 			targets = (
 				1F370F0F1B8D50B900A16D9A /* SmartLockSample */,
 				1F370F281B8D50B900A16D9A /* SmartLockSampleTests */,
+				1F3CDB251BA3355A00B26B7D /* SmartLockSample WatchKit Extension */,
+				1F3CDB331BA3355B00B26B7D /* SmartLockSample WatchKit App */,
 			);
 		};
 /* End PBXProject section */
@@ -254,6 +394,24 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F3CDB241BA3355A00B26B7D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F3CDB351BA3355B00B26B7D /* SmartLockSample WatchKit App.app in Resources */,
+				1F3CDB311BA3355A00B26B7D /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F3CDB321BA3355B00B26B7D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F3CDB3D1BA3355B00B26B7D /* Interface.storyboard in Resources */,
+				1FEB125A1BA7323B008A738A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,6 +441,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1F3CDB221BA3355A00B26B7D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F3CDB2C1BA3355A00B26B7D /* InterfaceController.m in Sources */,
+				1F3CDB2F1BA3355A00B26B7D /* GlanceController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -290,6 +457,16 @@
 			isa = PBXTargetDependency;
 			target = 1F370F0F1B8D50B900A16D9A /* SmartLockSample */;
 			targetProxy = 1F370F2A1B8D50B900A16D9A /* PBXContainerItemProxy */;
+		};
+		1F3CDB371BA3355B00B26B7D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1F3CDB331BA3355B00B26B7D /* SmartLockSample WatchKit App */;
+			targetProxy = 1F3CDB361BA3355B00B26B7D /* PBXContainerItemProxy */;
+		};
+		1F3CDB411BA3355B00B26B7D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1F3CDB251BA3355A00B26B7D /* SmartLockSample WatchKit Extension */;
+			targetProxy = 1F3CDB401BA3355B00B26B7D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -308,6 +485,14 @@
 				1F370F231B8D50B900A16D9A /* Base */,
 			);
 			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+		1F3CDB3B1BA3355B00B26B7D /* Interface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1F3CDB3C1BA3355B00B26B7D /* Base */,
+			);
+			name = Interface.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -397,6 +582,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = SmartLockSample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -407,6 +594,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = SmartLockSample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -447,6 +636,70 @@
 			};
 			name = Release;
 		};
+		1F3CDB431BA3355B00B26B7D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "SmartLockSample WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		1F3CDB441BA3355B00B26B7D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "SmartLockSample WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		1F3CDB451BA3355B00B26B7D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IBSC_MODULE = SmartLockSample_WatchKit_Extension;
+				INFOPLIST_FILE = "SmartLockSample WatchKit App/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				"TARGETED_DEVICE_FAMILY[sdk=iphonesimulator*]" = "1,4";
+			};
+			name = Debug;
+		};
+		1F3CDB461BA3355B00B26B7D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				IBSC_MODULE = SmartLockSample_WatchKit_Extension;
+				INFOPLIST_FILE = "SmartLockSample WatchKit App/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				"TARGETED_DEVICE_FAMILY[sdk=iphonesimulator*]" = "1,4";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -473,6 +726,24 @@
 			buildConfigurations = (
 				1F370F371B8D50B900A16D9A /* Debug */,
 				1F370F381B8D50B900A16D9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1F3CDB471BA3355B00B26B7D /* Build configuration list for PBXNativeTarget "SmartLockSample WatchKit App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F3CDB451BA3355B00B26B7D /* Debug */,
+				1F3CDB461BA3355B00B26B7D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1F3CDB481BA3355B00B26B7D /* Build configuration list for PBXNativeTarget "SmartLockSample WatchKit Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F3CDB431BA3355B00B26B7D /* Debug */,
+				1F3CDB441BA3355B00B26B7D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
