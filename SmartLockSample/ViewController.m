@@ -464,8 +464,8 @@ int last_index=0;
                                 //推送声音
                                 noti.soundName = UILocalNotificationDefaultSoundName;
                                 //内容
-                                noti.alertBody = @"lock is open";
-                                noti.alertAction = @"open the app";
+                                noti.alertBody = @"DOOR UNLOCKED!";
+                                noti.alertAction = @"open the app to check the lock";
                                 //显示在icon上的红色圈中的数子
                                 delegate.appIconBadgeNumber=delegate.appIconBadgeNumber+1;
                                 noti.applicationIconBadgeNumber = delegate.appIconBadgeNumber;
