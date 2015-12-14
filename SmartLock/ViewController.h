@@ -20,6 +20,8 @@
 @property (nonatomic, strong) SCNNode *btnLockNode;
 @property (nonatomic, strong) SCNNode *btnSearchNode;
 
+@property (weak, nonatomic) IBOutlet UILabel *labelAngle;
+@property (weak, nonatomic) IBOutlet UILabel *labelStatus;
 
 @property(strong, nonatomic) DFBlunoManager* blunoManager;
 @property(strong, nonatomic) DFBlunoDevice* blunoDev;

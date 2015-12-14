@@ -379,6 +379,8 @@ char recv_buffer[260];
 int last_index=0;
 -(void)didReceiveData:(NSData*)data Device:(DFBlunoDevice*)dev
 {
+//    NSString *strData=[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+//    NSLog(@"data is <%@>", strData);    
     char *p=(char *)data.bytes;
     if (last_index+data.length>255)
     {
@@ -441,6 +443,9 @@ int last_index=0;
             NSLog(@"update:  angle=%f,   status=%d,  %@", angle, status, str);
 
             dispatch_async(dispatch_get_main_queue(), ^{
+                self.labelAngle.text=[NSString stringWithFormat:@"%.3f", angle];
+                self.labelStatus.text=[NSString stringWithFormat:@"%d", status];
+                
                 SCNMatrix4 dcmYaw=SCNMatrix4MakeRotation(-angle/180.0*M_PI, 0, 1, 0);
                 SCNMatrix4 dcmPitch=SCNMatrix4MakeRotation(M_PI/2, 1, 0, 0);
                 self.mainObjectNode.transform= SCNMatrix4Mult(dcmYaw, dcmPitch);
@@ -507,7 +512,8 @@ int last_index=0;
         }
         else
         {
-            NSLog([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+            NSString *strData=[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            NSLog(@"data is <%@>", strData);
     //        self.labelReceivedMsg.text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         }
 
