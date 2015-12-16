@@ -66,6 +66,7 @@
                         <outlet property="labelAngle" destination="z0v-tl-9MN" id="jUt-w2-iuV"/>
                         <outlet property="labelStatus" destination="KQs-Ba-757" id="2ri-c9-W4L"/>
                         <outlet property="sceneView" destination="eVB-BC-UNa" id="Bj1-aq-3hu"/>
+                        <outlet property="viewInfomation" destination="t1l-XJ-pK6" id="kv9-PX-9Iv"/>
                         <segue destination="t9a-3A-hQK" kind="showDetail" identifier="toSearchListView" id="oLC-7i-Aku"/>
                     </connections>
                 </viewController>

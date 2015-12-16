@@ -21,8 +21,10 @@
     float _angle_current;
 }
 
-SystemSoundID id_alarm=1010;
-SystemSoundID id_button=1052;
+SystemSoundID id_alarm;
+SystemSoundID id_button;
+SystemSoundID id_longpress;
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -37,7 +39,27 @@ SystemSoundID id_button=1052;
     self.blunoManager = [DFBlunoManager sharedInstance];
     _angle_offset=0;
     
+    [self prepareSoundEffects];
 }
+
+
+-(void) prepareSoundEffects
+{
+    // Get the main bundle for the app
+    CFBundleRef mainBundle = CFBundleGetMainBundle ();
+    
+    // Create a system sound object representing the sound file
+    AudioServicesCreateSystemSoundID (CFBundleCopyResourceURL (mainBundle, CFSTR ("Sound/sms-received4"), CFSTR ("caf"), NULL),
+                                      &id_alarm
+                                      );
+    AudioServicesCreateSystemSoundID (CFBundleCopyResourceURL (mainBundle, CFSTR ("Sound/Cartoon Accent 17"), CFSTR ("caf"), NULL),
+                                      &id_button
+                                      );
+    AudioServicesCreateSystemSoundID (CFBundleCopyResourceURL (mainBundle, CFSTR ("Sound/Bell Transition"), CFSTR ("caf"), NULL),
+                                      &id_longpress
+                                      );
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -177,8 +199,12 @@ SystemSoundID id_button=1052;
     
     // add a tap gesture recognizer
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    longPressGesture.minimumPressDuration=2.0f;
+    
     NSMutableArray *gestureRecognizers = [NSMutableArray array];
     [gestureRecognizers addObject:tapGesture];
+    [gestureRecognizers addObject:longPressGesture];
     
     // default gest
     [gestureRecognizers addObjectsFromArray:scnView.gestureRecognizers];
@@ -186,7 +212,7 @@ SystemSoundID id_button=1052;
 }
 
 
-#pragma mark - tap processing for 3D scene
+#pragma mark - gesture processing for 3D scene
 -(NSString *)generateSettingString: (BOOL) isLock
 {
     NSString* stringHolder;
@@ -214,48 +240,147 @@ SystemSoundID id_button=1052;
     
     
     // check that we clicked on at least one object
-    if([hitResults count] > 0)
+    if([hitResults count] <= 0)
     {
+        return;
+    }
+
+    // retrieved the first clicked object
+    SCNHitTestResult *result = [hitResults objectAtIndex:0];
+
+    //解锁位置按钮
+    if (result.node==self.btnUnlockNode)
+    {
+        [self highlightObject:result.node duration:0.25 needToRecover:YES];
+        AudioServicesPlaySystemSound(id_button);
+//        AudioServicesPlaySystemSound(SystemSoundID inSystemSoundID);
+        
+        NSData* data = [[self generateSettingString:NO] dataUsingEncoding:NSUTF8StringEncoding];
+        [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
+        
+    }
+    //上锁位置按钮
+    else if (result.node==self.btnLockNode)
+    {
+        [self highlightObject:result.node duration:0.25 needToRecover:YES];
         AudioServicesPlaySystemSound(id_button);
 
-        // retrieved the first clicked object
-        SCNHitTestResult *result = [hitResults objectAtIndex:0];
-
-        //解锁位置按钮
-        if (result.node==self.btnUnlockNode)
-        {
-            [self highlightObject:result.node duration:0.25 needToRecover:YES];
-
-            NSData* data = [[self generateSettingString:NO] dataUsingEncoding:NSUTF8StringEncoding];
-            [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
-            
-        }
-        //上锁位置按钮
-        else if (result.node==self.btnLockNode)
-        {
-            [self highlightObject:result.node duration:0.25 needToRecover:YES];
-            NSData* data = [[self generateSettingString:YES] dataUsingEncoding:NSUTF8StringEncoding];
-            [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
-        }
-        //搜索按钮
-        else if (result.node==self.btnSearchNode)
-        {
-            [self highlightObject:result.node duration:0.25 needToRecover:YES];
-            self.ambientLightNode.hidden=YES;
-            [self performSegueWithIdentifier:@"toSearchListView" sender:nil];
-        }
-        //主体按钮，用于设定初始状态，要求用户在开锁N区设定
-        else if (result.node.parentNode==self.mainObjectNode)
-        {
-            [self highlightObject: result.node.parentNode duration:0.5 needToRecover:YES];
-            _angle_offset=_angle_current;
-            
-            
-            NSData* data = [@"#ir" dataUsingEncoding:NSUTF8StringEncoding];
-            [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
-        }
+        NSData* data = [[self generateSettingString:YES] dataUsingEncoding:NSUTF8StringEncoding];
+        [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
     }
+    //搜索按钮
+    else if (result.node==self.btnSearchNode)
+    {
+        [self highlightObject:result.node duration:0.25 needToRecover:YES];
+        AudioServicesPlaySystemSound(id_button);
+
+        self.ambientLightNode.hidden=YES;
+        [self performSegueWithIdentifier:@"toSearchListView" sender:nil];
+    }
+    //主体按钮，用于设定初始状态，要求用户在开锁N区设定
+    else if (result.node.parentNode==self.mainObjectNode)
+    {
+        [self highlightObject: result.node.parentNode duration:0.5 needToRecover:YES];
+        AudioServicesPlaySystemSound(id_button);
+
+        _angle_offset=_angle_current;
+        
+        
+        NSData* data = [@"#ir" dataUsingEncoding:NSUTF8StringEncoding];
+        [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
+    }
+    
 }
+
+
+
+
+-(void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognize
+{
+//    NSLog(@"longpress:%ld",(long)gesture.state);
+    // retrieve the SCNView
+    SCNView *scnView = (SCNView *)self.sceneView;
+    
+    // check what nodes are tapped
+    CGPoint p = [gestureRecognize locationInView:scnView];
+    NSArray *hitResults = [scnView hitTest:p options:nil];
+    
+    if([hitResults count] <= 0)
+        return;
+    
+    // retrieved the first clicked object
+    SCNHitTestResult *result = [hitResults objectAtIndex:0];
+    if (result.node.parentNode!=self.mainObjectNode)
+        return;
+    
+    //在按下时生效
+    if (gestureRecognize.state==UIGestureRecognizerStateBegan)
+    {
+        [self shadeObject:result.node.parentNode duration:0.25f color:[UIColor redColor] complete:^{
+
+            SCNHitTestResult *result = [hitResults objectAtIndex:0];
+            if (result.node.parentNode==self.mainObjectNode)
+            {
+                AudioServicesPlaySystemSound(id_longpress);
+                UIAlertController *alertController=[UIAlertController alertControllerWithTitle:nil
+                                                                                       message:nil
+                                                                                preferredStyle:UIAlertControllerStyleActionSheet];
+                
+                [alertController addAction: [UIAlertAction actionWithTitle: @"Reset device"
+                                                                     style: UIAlertActionStyleDefault
+                                                                   handler:^(UIAlertAction *action)
+                                             {
+                                                 NSLog(@"RESET");
+                                                 [self shadeObject:result.node.parentNode duration:0.25 color:[UIColor blackColor] complete:nil];
+                                                 //重启Arduino
+                                                 NSData* data = [[self generateSettingString:NO] dataUsingEncoding:NSUTF8StringEncoding];
+                                                 [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
+                                             }]];
+                
+                [alertController addAction: [UIAlertAction actionWithTitle: self.viewIfLoaded.hidden?@"Show details":@"Hide details"
+                                                                     style: UIAlertActionStyleDefault
+                                                                   handler:^(UIAlertAction *action)
+                                             {
+                                                 [self shadeObject:result.node.parentNode duration:0.25 color:[UIColor blackColor] complete:nil];
+                                                 self.viewInfomation.hidden=!self.viewInfomation.hidden;
+                                            
+                                             }]];
+                
+                [alertController addAction: [UIAlertAction actionWithTitle: @"Return"
+                                                                     style: UIAlertActionStyleDefault
+                                                                   handler:^(UIAlertAction *action)
+                                             {
+                                                 [self shadeObject:result.node.parentNode duration:0.25 color:[UIColor blackColor] complete:nil];
+                                                 
+                                             }]];
+                
+                [self presentViewController: alertController animated: YES completion:nil];
+            }
+
+        }];
+    }
+    
+}
+
+
+//-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+//{
+//    UITouch *touch = [touches anyObject];
+//    SCNView *scnView = (SCNView *)self.sceneView;
+//    CGPoint p=[touch locationInView:scnView];
+//    
+//    NSArray *hitResults = [scnView hitTest:p options:nil];
+//    
+//    if([hitResults count] <= 0)
+//        return;
+//    
+//    // retrieved the first clicked object
+//    SCNHitTestResult *result = [hitResults objectAtIndex:0];
+//    if (result.node.parentNode!=self.mainObjectNode)
+//        return;
+//    
+//    [self highlightObject:result.node.parentNode duration:0.25 needToRecover:YES];
+//}
 
 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
@@ -268,7 +393,7 @@ SystemSoundID id_button=1052;
 }
 
 
--(void) highlightObject:(SCNNode *)objectNode duration:(CFTimeInterval)sec needToRecover:(bool)needToRecover
+-(void) shadeObject:(SCNNode *)objectNode duration:(CFTimeInterval)sec color:(UIColor *)color complete:(void (^)(void))block
 {
     // highlight it
     [SCNTransaction begin];
@@ -279,36 +404,30 @@ SystemSoundID id_button=1052;
         for (SCNNode *node in objectNode.childNodes) {
             // get its material
             SCNMaterial *material = node.geometry.firstMaterial;
-            material.emission.contents = [UIColor redColor];
+            material.emission.contents = color;
         }
     }
     else
     {
-        objectNode.geometry.firstMaterial.emission.contents=[UIColor redColor];
+        objectNode.geometry.firstMaterial.emission.contents=color;
     }
-    
-    if (needToRecover)
-    {
-        // on completion - unhighlight
-        [SCNTransaction setCompletionBlock:^{
-            [SCNTransaction begin];
-            [SCNTransaction setAnimationDuration:sec];
-            if (objectNode.childNodes.count>0)
-            {
-                for (SCNNode *node in objectNode.childNodes) {
-                    // get its material
-                    SCNMaterial *material = node.geometry.firstMaterial;
-                    material.emission.contents = [UIColor blackColor];
-                }
-            }
-            else
-            {
-                objectNode.geometry.firstMaterial.emission.contents=[UIColor blackColor];
-            }        [SCNTransaction commit];
-        }];
-    }
-    
+        
+    // on completion - unhighlight
+    if (block)
+        [SCNTransaction setCompletionBlock:block];
+ 
     [SCNTransaction commit];
+}
+
+
+
+
+-(void) highlightObject:(SCNNode *)objectNode duration:(CFTimeInterval)sec needToRecover:(bool)needToRecover
+{
+    // highlight it
+    [self shadeObject:objectNode duration:sec color:[UIColor redColor] complete:^{
+        [self shadeObject:objectNode duration:sec color:[UIColor blackColor] complete:nil];
+    }];
 }
 
 

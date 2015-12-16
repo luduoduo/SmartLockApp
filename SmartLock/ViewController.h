@@ -20,6 +20,7 @@
 @property (nonatomic, strong) SCNNode *btnLockNode;
 @property (nonatomic, strong) SCNNode *btnSearchNode;
 
+@property (weak, nonatomic) IBOutlet UIStackView *viewInfomation;
 @property (weak, nonatomic) IBOutlet UILabel *labelAngle;
 @property (weak, nonatomic) IBOutlet UILabel *labelStatus;
 

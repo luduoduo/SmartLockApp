@@ -10,7 +10,7 @@
 #import "DFBlunoManager.h"
 
 @interface DeviceListViewController : UIViewController
-    <UITableViewDataSource, UITableViewDelegate>
+    <DFBlunoDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @property(strong, nonatomic) DFBlunoManager* blunoManager;
 @property(strong, nonatomic) DFBlunoDevice* blunoDev;

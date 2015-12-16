@@ -24,6 +24,7 @@
 		1F3CDB351BA3355B00B26B7D /* SmartLockWatchKitApp.app in Resources */ = {isa = PBXBuildFile; fileRef = 1F3CDB341BA3355B00B26B7D /* SmartLockWatchKitApp.app */; };
 		1F3CDB3D1BA3355B00B26B7D /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F3CDB3B1BA3355B00B26B7D /* Interface.storyboard */; };
 		1F3CDB421BA3355B00B26B7D /* SmartLockWatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 1F3CDB261BA3355A00B26B7D /* SmartLockWatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1F9A62B61C1EAED8005FBB7C /* Sound in Resources */ = {isa = PBXBuildFile; fileRef = 1F9A62B51C1EAED8005FBB7C /* Sound */; };
 		1FEB125A1BA7323B008A738A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F370F201B8D50B900A16D9A /* Images.xcassets */; };
 		1FEB125D1BA7B9E0008A738A /* InterfaceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F3CDB2B1BA3355A00B26B7D /* InterfaceController.m */; };
 		1FEB125E1BA7B9F2008A738A /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1F3CDB291BA3355A00B26B7D /* Info.plist */; };
@@ -92,6 +93,7 @@
 		1F3CDB341BA3355B00B26B7D /* SmartLockWatchKitApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartLockWatchKitApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F3CDB3A1BA3355B00B26B7D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1F3CDB3C1BA3355B00B26B7D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
+		1F9A62B51C1EAED8005FBB7C /* Sound */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sound; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +157,7 @@
 		1F370F131B8D50B900A16D9A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				1F9A62B51C1EAED8005FBB7C /* Sound */,
 				1F370F141B8D50B900A16D9A /* Info.plist */,
 				1F370F151B8D50B900A16D9A /* main.m */,
 			);
@@ -327,6 +330,7 @@
 			files = (
 				1F370F1F1B8D50B900A16D9A /* Main.storyboard in Resources */,
 				1F370F241B8D50B900A16D9A /* LaunchScreen.xib in Resources */,
+				1F9A62B61C1EAED8005FBB7C /* Sound in Resources */,
 				1F370F211B8D50B900A16D9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
