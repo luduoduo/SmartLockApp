@@ -19,6 +19,9 @@
 {
     float _angle_offset;
     float _angle_current;
+    
+    BOOL _isLockStatusOutputOn;
+    BOOL _isFullAngleOutputOn;
 }
 
 SystemSoundID id_alarm;
@@ -40,6 +43,9 @@ SystemSoundID id_longpress;
     _angle_offset=0;
     
     [self prepareSoundEffects];
+    
+    _isLockStatusOutputOn=YES;
+    _isFullAngleOutputOn=NO;
 }
 
 
@@ -212,8 +218,27 @@ SystemSoundID id_longpress;
 }
 
 
-#pragma mark - gesture processing for 3D scene
--(NSString *)generateSettingString: (BOOL) isLock
+#pragma mark - commandline generation
+-(NSString *)genStrCMDReset
+{
+    NSString *stringData=[NSString stringWithFormat:@"#R"];
+    return stringData;
+}
+
+-(NSString *)genStrCMDLockStatusOnOff: (BOOL) isOn
+{
+    NSString *stringData=[NSString stringWithFormat:@"#l%d", isOn];
+    return stringData;
+}
+
+-(NSString *)genStrCMDFullAngleOnOff: (BOOL) isOn
+{
+    NSString *stringData=[NSString stringWithFormat:@"#o%d", isOn];
+    return stringData;
+}
+
+
+-(NSString *)genStrCMDSettingUL: (BOOL) isLock
 {
     NSString* stringHolder;
     int angle_i=(int)fabs(round(_angle_current));
@@ -229,6 +254,7 @@ SystemSoundID id_longpress;
 }
 
 
+#pragma mark - gesture processing for 3D scene
 - (void) handleTap:(UIGestureRecognizer*)gestureRecognize
 {
     // retrieve the SCNView
@@ -255,7 +281,7 @@ SystemSoundID id_longpress;
         AudioServicesPlaySystemSound(id_button);
 //        AudioServicesPlaySystemSound(SystemSoundID inSystemSoundID);
         
-        NSData* data = [[self generateSettingString:NO] dataUsingEncoding:NSUTF8StringEncoding];
+        NSData* data = [[self genStrCMDSettingUL:NO] dataUsingEncoding:NSUTF8StringEncoding];
         [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
         
     }
@@ -265,7 +291,7 @@ SystemSoundID id_longpress;
         [self highlightObject:result.node duration:0.25 needToRecover:YES];
         AudioServicesPlaySystemSound(id_button);
 
-        NSData* data = [[self generateSettingString:YES] dataUsingEncoding:NSUTF8StringEncoding];
+        NSData* data = [[self genStrCMDSettingUL:YES] dataUsingEncoding:NSUTF8StringEncoding];
         [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
     }
     //搜索按钮
@@ -277,7 +303,7 @@ SystemSoundID id_longpress;
         self.ambientLightNode.hidden=YES;
         [self performSegueWithIdentifier:@"toSearchListView" sender:nil];
     }
-    //主体按钮，用于设定初始状态，要求用户在开锁N区设定
+    //主体按钮，用于full angle模式重置初始位置；或者lock status模式设定初始状态，要求用户在开锁N区设定
     else if (result.node.parentNode==self.mainObjectNode)
     {
         [self highlightObject: result.node.parentNode duration:0.5 needToRecover:YES];
@@ -333,9 +359,28 @@ SystemSoundID id_longpress;
                                                  NSLog(@"RESET");
                                                  [self shadeObject:result.node.parentNode duration:0.25 color:[UIColor blackColor] complete:nil];
                                                  //重启Arduino
-                                                 NSData* data = [[self generateSettingString:NO] dataUsingEncoding:NSUTF8StringEncoding];
+                                                 NSData* data = [[self genStrCMDReset] dataUsingEncoding:NSUTF8StringEncoding];
                                                  [self.blunoManager writeDataToDevice:data Device:self.blunoDev];
                                              }]];
+                
+                
+                [alertController addAction: [UIAlertAction actionWithTitle: @"Switch lock status / full angle"
+                                                                     style: UIAlertActionStyleDefault
+                                                                   handler:^(UIAlertAction *action)
+                                             {
+                                                 NSLog(@"output on/off");
+                                                 [self shadeObject:result.node.parentNode duration:0.25 color:[UIColor blackColor] complete:nil];
+                                                 //开关lock status输出
+                                                 _isLockStatusOutputOn=!_isLockStatusOutputOn;
+                                                 _isFullAngleOutputOn=!_isFullAngleOutputOn;
+                                                 NSData* data1 = [[self genStrCMDLockStatusOnOff:_isLockStatusOutputOn] dataUsingEncoding:NSUTF8StringEncoding];
+                                                 [self.blunoManager writeDataToDevice:data1 Device:self.blunoDev];
+                                                 
+                                                  NSData* data2 = [[self genStrCMDFullAngleOnOff:_isFullAngleOutputOn] dataUsingEncoding:NSUTF8StringEncoding];
+                                                 [self.blunoManager writeDataToDevice:data2 Device:self.blunoDev];
+                                                 
+                                             }]];
+                
                 
                 [alertController addAction: [UIAlertAction actionWithTitle: self.viewIfLoaded.hidden?@"Show details":@"Hide details"
                                                                      style: UIAlertActionStyleDefault
@@ -499,7 +544,9 @@ int last_index=0;
 -(void)didReceiveData:(NSData*)data Device:(DFBlunoDevice*)dev
 {
 //    NSString *strData=[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-//    NSLog(@"data is <%@>", strData);    
+//    NSLog(@"data is <%@>", strData);
+    
+    //1.将数据包接在一个buffer里
     char *p=(char *)data.bytes;
     if (last_index+data.length>255)
     {
@@ -511,133 +558,150 @@ int last_index=0;
     memcpy(recv_buffer+last_index, p, data.length);
     last_index+=(int)data.length;
     
-    if (p[data.length-2]=='\r' && p[data.length-1]=='\n')
+    //2.从buffer里按照"\r\n"断开
+    int previous_index=0;
+    for (int index=0; index<last_index-1; index++)
     {
-        //"short text for float" mode
-        //for exmaple, @-1653-0043+1620 means -165.3, -4.3, +162
-        if (last_index==18 && recv_buffer[0]=='@')
+        if (!(recv_buffer[index]!='\r' && recv_buffer[index]=='\n'))
+            continue;
+        
+        //full angle mode
+        if (p[data.length-2]=='\r' && p[data.length-1]=='\n')
         {
-            char temp[16];
-            memcpy(temp, recv_buffer+1, 15);
-            temp[15]=0;
-            
-            NSString *str=[NSString stringWithUTF8String:temp];
-            float yaw= [[str substringWithRange:NSMakeRange(0, 5)] floatValue]/10.0;
-            float pitch= [[str substringWithRange:NSMakeRange(5, 5)] floatValue]/10.0;
-            float roll= [[str substringWithRange:NSMakeRange(10, 5)] floatValue]/10.0;
-            
-            NSLog(@"update:  Y=%f, P=%f, R=%f,   %@", yaw, pitch, roll, str);
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                //YPR相当于绕SceneKit的-y, x, -z
-                float rorateX=pitch/180.0*M_PI;
-                float rorateY=-(yaw-_angle_offset)/180.0*M_PI;
-                float rorateZ=-roll/180.0*M_PI;
+            //"short text for float" mode
+            //for exmaple, @-1653-0043+1620 means -165.3, -4.3, +162
+            //Full angle 输出模式，收到的是YPR顺序的欧拉角
+            if (index+1-previous_index==18 && recv_buffer[previous_index]=='@')
+            {
+                char temp[16];
+                memcpy(temp, recv_buffer+previous_index+1, 15);
+                temp[15]=0;
                 
-                SCNMatrix4 dcmYaw=SCNMatrix4MakeRotation(rorateY, 0, 1, 0);
-                SCNMatrix4 dcmPitch=SCNMatrix4MakeRotation(rorateX, 1, 0, 0);
-                SCNMatrix4 dcmRoll=SCNMatrix4MakeRotation(rorateZ, 0, 0, 1);
-                self.mainObjectNode.transform= SCNMatrix4Mult(SCNMatrix4Mult(dcmRoll, dcmPitch),dcmYaw);
+                NSString *str=[NSString stringWithUTF8String:temp];
+                float yaw= [[str substringWithRange:NSMakeRange(0, 5)] floatValue]/10.0;
+                float pitch= [[str substringWithRange:NSMakeRange(5, 5)] floatValue]/10.0;
+                float roll= [[str substringWithRange:NSMakeRange(10, 5)] floatValue]/10.0;
                 
-    //            NSLog(@"rotate=%f,   %f,   %f",
-    //                  rorateY/M_PI*180,
-    //                  rorateX/M_PI*180,
-    //                  rorateZ/M_PI*180);
+                NSLog(@"update:  Y=%f, P=%f, R=%f,   %@", yaw, pitch, roll, str);
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    //YPR相当于绕SceneKit的-y, x, -z
+                    float rorateX=pitch/180.0*M_PI;
+                    float rorateY=-(yaw-_angle_offset)/180.0*M_PI;
+                    float rorateZ=-roll/180.0*M_PI;
+                    
+                    SCNMatrix4 dcmYaw=SCNMatrix4MakeRotation(rorateY, 0, 1, 0);
+                    SCNMatrix4 dcmPitch=SCNMatrix4MakeRotation(rorateX, 1, 0, 0);
+                    SCNMatrix4 dcmRoll=SCNMatrix4MakeRotation(rorateZ, 0, 0, 1);
+                    self.mainObjectNode.transform= SCNMatrix4Mult(SCNMatrix4Mult(dcmRoll, dcmPitch),dcmYaw);
+                    
+        //            NSLog(@"rotate=%f,   %f,   %f",
+        //                  rorateY/M_PI*180,
+        //                  rorateX/M_PI*180,
+        //                  rorateZ/M_PI*180);
 
-                _angle_current=yaw;
+                    _angle_current=yaw;
+                    
+                });
                 
-            });
-            
-        }
-        else if (last_index==10 && recv_buffer[0]=='%')  //for lock status
-        {
-            char temp[8];
-            memcpy(temp, recv_buffer+1, 7); //skip first %
-            temp[7]=0;
-            
-            NSString *str=[NSString stringWithUTF8String:temp];
-            float angle= [[str substringWithRange:NSMakeRange(0, 5)] floatValue]/10.0;
-            int status= [[str substringWithRange:NSMakeRange(6, 1)] intValue];
-
-            NSLog(@"update:  angle=%f,   status=%d,  %@", angle, status, str);
-
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.labelAngle.text=[NSString stringWithFormat:@"%.3f", angle];
-                self.labelStatus.text=[NSString stringWithFormat:@"%d", status];
+            }
+            //Lock status mode
+            else if (index+1-previous_index==10 && recv_buffer[previous_index]=='%')  //for lock status
+            {
+                char temp[8];
+                memcpy(temp, recv_buffer+previous_index+1, 7); //skip first %
+                temp[7]=0;
                 
-                SCNMatrix4 dcmYaw=SCNMatrix4MakeRotation(-angle/180.0*M_PI, 0, 1, 0);
-                SCNMatrix4 dcmPitch=SCNMatrix4MakeRotation(M_PI/2, 1, 0, 0);
-                self.mainObjectNode.transform= SCNMatrix4Mult(dcmYaw, dcmPitch);
- 
-                _angle_current=angle;
-                if (status<=0)  //lock is open
-                {
-                    if ([[UIApplication sharedApplication] applicationState]== UIApplicationStateBackground)
+                NSString *str=[NSString stringWithUTF8String:temp];
+                float angle= [[str substringWithRange:NSMakeRange(0, 5)] floatValue]/10.0;
+                int status= [[str substringWithRange:NSMakeRange(6, 1)] intValue];
+
+                NSLog(@"update:  angle=%f,   status=%d,  %@", angle, status, str);
+
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    self.labelAngle.text=[NSString stringWithFormat:@"%.3f", angle];
+                    self.labelStatus.text=[NSString stringWithFormat:@"%d", status];
+                    
+                    SCNMatrix4 dcmYaw=SCNMatrix4MakeRotation(-angle/180.0*M_PI, 0, 1, 0);
+                    SCNMatrix4 dcmPitch=SCNMatrix4MakeRotation(M_PI/2, 1, 0, 0);
+                    self.mainObjectNode.transform= SCNMatrix4Mult(dcmYaw, dcmPitch);
+     
+                    _angle_current=angle;
+                    if (status<=0)  //lock is open
                     {
-                        AppDelegate *delegate=(AppDelegate *)[UIApplication sharedApplication].delegate;
-                        if (delegate.appIconBadgeNumber==0)
+                        if ([[UIApplication sharedApplication] applicationState]== UIApplicationStateBackground)
                         {
-                            //收到数据, 设置推送
-                            UILocalNotification *noti = [[UILocalNotification alloc] init];
-                            if (noti)
+                            AppDelegate *delegate=(AppDelegate *)[UIApplication sharedApplication].delegate;
+                            if (delegate.appIconBadgeNumber==0)
                             {
-                                //设置时区
-                                noti.timeZone = [NSTimeZone defaultTimeZone];
-                                //设置重复间隔
-//                                noti.repeatInterval = NSCalendarUnitMinute;
-                                //推送声音
-                                noti.soundName = UILocalNotificationDefaultSoundName;
-                                //内容
-                                noti.alertBody = @"DOOR UNLOCKED!";
-                                noti.alertAction = @"open the app to check the lock";
-                                //显示在icon上的红色圈中的数子
-                                delegate.appIconBadgeNumber=delegate.appIconBadgeNumber+1;
-                                noti.applicationIconBadgeNumber = delegate.appIconBadgeNumber;
-                                //设置userinfo 方便在之后需要撤销的时候使用
-    //                            NSDictionary *infoDic = [NSDictionary dictionaryWithObject:@"name" forKey:@"key"];
-    //                            noti.userInfo = infoDic;  
-                                //添加推送到uiapplication
-    //                            UIApplication *app = [UIApplication sharedApplication];  
-    //                            [app scheduleLocalNotification:noti];
-                                
-                                [[UIApplication sharedApplication] presentLocalNotificationNow:noti];
+                                //收到数据, 设置推送
+                                UILocalNotification *noti = [[UILocalNotification alloc] init];
+                                if (noti)
+                                {
+                                    //设置时区
+                                    noti.timeZone = [NSTimeZone defaultTimeZone];
+                                    //设置重复间隔
+    //                                noti.repeatInterval = NSCalendarUnitMinute;
+                                    //推送声音
+                                    noti.soundName = UILocalNotificationDefaultSoundName;
+                                    //内容
+                                    noti.alertBody = @"DOOR UNLOCKED!";
+                                    noti.alertAction = @"open the app to check the lock";
+                                    //显示在icon上的红色圈中的数子
+                                    delegate.appIconBadgeNumber=delegate.appIconBadgeNumber+1;
+                                    noti.applicationIconBadgeNumber = delegate.appIconBadgeNumber;
+                                    //设置userinfo 方便在之后需要撤销的时候使用
+        //                            NSDictionary *infoDic = [NSDictionary dictionaryWithObject:@"name" forKey:@"key"];
+        //                            noti.userInfo = infoDic;  
+                                    //添加推送到uiapplication
+        //                            UIApplication *app = [UIApplication sharedApplication];  
+        //                            [app scheduleLocalNotification:noti];
+                                    
+                                    [[UIApplication sharedApplication] presentLocalNotificationNow:noti];
+                                }
                             }
                         }
+                        
+                        [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor redColor];
+                        [self highlightObject: self.mainObjectNode duration:0.005 needToRecover:YES];
+                        
+                        alarm_count++;
+                        if (alarm_count%20==1)
+                            AudioServicesPlaySystemSound(id_alarm);
                     }
-                    
-                    [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor redColor];
-                    [self highlightObject: self.mainObjectNode duration:0.005 needToRecover:YES];
-                    
-                    alarm_count++;
-                    if (alarm_count%20==1)
-                        AudioServicesPlaySystemSound(id_alarm);
-                }
-                else
-                {
-                    alarm_count=0;
-                    
-                    if (status==1)
-                        [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor greenColor];
-                    else if (status==2)
-                        [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor yellowColor];
-                    else if (status>=3)
-                        [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor orangeColor];
-                    
+                    else
+                    {
+                        alarm_count=0;
+                        
+                        if (status==1)
+                            [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor greenColor];
+                        else if (status==2)
+                            [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor yellowColor];
+                        else if (status>=3)
+                            [self.mainObjectNode.childNodes.firstObject geometry].firstMaterial.diffuse.contents=[UIColor orangeColor];
+                        
 
-                    //                    [self highlightObject: self.mainObjectNode duration:0 needToRecover:YES];
-                }
-            });
+                        //                    [self highlightObject: self.mainObjectNode duration:0 needToRecover:YES];
+                    }
+                });
 
+            }
+            //unknown data
+            else
+            {
+                char temp[256];
+                memcpy(temp, recv_buffer+previous_index, index-1-previous_index); //throw \r\n
+                NSString *str=[NSString stringWithUTF8String:temp];
+                NSLog(@"descarded data is {%@}", str);
+            }
+
+            previous_index=index+1;
         }
-        else
-        {
-            NSString *strData=[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            NSLog(@"data is <%@>", strData);
-    //        self.labelReceivedMsg.text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        }
-
-        last_index=0;   //this line is over
     }
+    
+    //3. 移动剩余数据
+    memcpy(recv_buffer, recv_buffer+previous_index, last_index-previous_index);
+    last_index-=previous_index;
 }
 
 -(void)didUpdateDeviceInfo
