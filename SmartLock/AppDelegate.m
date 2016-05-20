@@ -22,6 +22,9 @@
         [[UIApplication sharedApplication]registerUserNotificationSettings:
          [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound
                                            categories:nil]];
+        
+        //add remote support
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
     }
     
     self.appIconBadgeNumber=0;
@@ -51,6 +54,30 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo
+{
+    
+    NSLog(@"userInfo: %@", userInfo);
+    NSDictionary *aps = [userInfo objectForKey:@"aps"];
+    if (aps) {
+        NSString *alertMsg = [aps objectForKey:@"alert"];
+        NSLog(@"Notification message: %@", alertMsg);
+    }
+
+}
+
+
+// 注册成功回调方法，其中deviceToken即为APNs返回的token
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(nonnull NSData *)deviceToken
+{
+    NSLog(@"Device Token=%@", deviceToken);
+}
+// 注册失败回调方法，处理失败情况
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    NSLog(@"didFailToRegisterForRemoteNotificationsWithError %@", error);
 }
 
 //- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
